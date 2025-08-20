@@ -21,8 +21,7 @@ interface ProductStock {
 
 export default function StockManagementPage() {
   const { user, loading: authLoading, logout } = useAuth();
-  const router = useRouter();
-  const [stockData, setStockData] = useState<ProductStock[]>([]);
+  const router = useRouter();  const [stockData, setStockData] = useState<ProductStock[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [changes, setChanges] = useState<Record<string, number>>({});
@@ -229,10 +228,8 @@ export default function StockManagementPage() {
             Logout
           </Button>
         </div>
-      </div>
-
-      {/* Stock Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      </div>      {/* Stock Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
@@ -240,8 +237,32 @@ export default function StockManagementPage() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Items</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {stockData.reduce((sum, item) => sum + item.quantity, 0)}
+                  {stockCounts.total}
                 </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <Package className="h-8 w-8 text-green-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">In Stock</p>
+                <p className="text-2xl font-bold text-gray-900">{stockCounts.inStock}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <AlertTriangle className="h-8 w-8 text-yellow-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Low Stock</p>
+                <p className="text-2xl font-bold text-gray-900">{stockCounts.lowStock}</p>
               </div>
             </div>
           </CardContent>
@@ -302,16 +323,15 @@ export default function StockManagementPage() {
                     Actions
                   </th>
                 </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {stockData.length === 0 ? (
+              </thead>              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredStockData.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                       No stock data found. Please check your database setup.
                     </td>
                   </tr>
                 ) : (
-                  stockData.map((item) => {
+                  filteredStockData.map((item) => {
                     const stockStatus = getStockStatus(item.quantity, item.low_stock_threshold);
                     const hasChange = changes.hasOwnProperty(item.id);
                     

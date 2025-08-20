@@ -227,14 +227,13 @@ export default function DebugTelegramPage() {
                 • Copy the bot token (format: 123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ)
               </p>
             </div>
-            
-            <div>
+              <div>
               <h4 className="font-medium text-gray-900">2. Get Your Chat ID</h4>
               <p className="text-gray-600">
                 • Start a conversation with your bot<br/>
                 • Send any message to your bot<br/>
                 • Visit: https://api.telegram.org/bot&lt;YOUR_BOT_TOKEN&gt;/getUpdates<br/>
-                • Look for "chat":{"id":123456789} in the response<br/>
+                • Look for {'"chat":{{"id":123456789}'} in the response<br/>
                 • Copy the ID number
               </p>
             </div>

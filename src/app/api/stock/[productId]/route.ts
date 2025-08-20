@@ -4,10 +4,11 @@ import { supabase } from '@/lib/supabase';
 // GET - Fetch stock for a specific product
 export async function GET(
   request: NextRequest,
-  { params }: { params: { productId: string } }
+  { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
-    const productId = params.productId;
+    const resolvedParams = await params;
+    const productId = resolvedParams.productId;
 
     const { data, error } = await supabase
       .from('product_stock')
@@ -44,10 +45,11 @@ export async function GET(
 // PUT - Update stock for a specific product size
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { productId: string } }
+  { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
-    const productId = params.productId;
+    const resolvedParams = await params;
+    const productId = resolvedParams.productId;
     const body = await request.json();
     const { size, quantity } = body;
 

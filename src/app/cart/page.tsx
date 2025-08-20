@@ -13,13 +13,12 @@ export default function CartPage() {
   const { items, updateQuantity, removeItem, clearCart } = useCart();
   const [promoCode, setPromoCode] = useState('');
   const [promoApplied, setPromoApplied] = useState(false);
-
   // Calculate cart totals using dynamic pricing
   const totalQuantity = items.reduce((total, item) => total + item.quantity, 0);
   const subtotal = calculatePrice(totalQuantity);
   const discount = promoApplied ? subtotal * 0.1 : 0; // 10% discount if promo applied
-  const shipping = 0; // Fixed at 0DH to match checkout
-  const tax = 0; // Remove tax to match checkout
+  const shipping: number = 0; // Fixed at 0DH to match checkout
+  const tax: number = 0; // Remove tax to match checkout
   const total = subtotal - discount + shipping + tax;
   
   const handlePromoCode = () => {

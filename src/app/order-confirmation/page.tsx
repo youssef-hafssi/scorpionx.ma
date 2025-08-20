@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useOrders } from '@/lib/order-context';
 import type { Order } from '@/lib/order-context';
 
-export default function OrderConfirmationPage() {
+function OrderConfirmationContent() {
   const searchParams = useSearchParams();
   const { getOrder } = useOrders();
   const [order, setOrder] = useState<Order | null>(null);
@@ -150,8 +150,19 @@ export default function OrderConfirmationPage() {
               </Link>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </CardContent>      </Card>
     </div>
+  );
+}
+
+export default function OrderConfirmationPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-16 max-w-3xl">
+        <div className="text-center">Loading...</div>
+      </div>
+    }>
+      <OrderConfirmationContent />
+    </Suspense>
   );
 }

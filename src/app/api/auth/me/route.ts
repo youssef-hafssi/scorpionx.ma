@@ -15,13 +15,11 @@ export async function GET(request: NextRequest) {
         { error: 'Not authenticated' },
         { status: 401 }
       );
-    }
-
-    // Verify JWT
-    let decoded: any;
+    }    // Verify JWT
+    let decoded: { userId: string; email: string; role: string };
     try {
-      decoded = verify(token, JWT_SECRET);
-    } catch (jwtError) {
+      decoded = verify(token, JWT_SECRET) as { userId: string; email: string; role: string };
+    } catch {
       return NextResponse.json(
         { error: 'Invalid token' },
         { status: 401 }
