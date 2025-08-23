@@ -22,14 +22,15 @@ export default function ProductPage() {
   const [stockData, setStockData] = useState<Record<string, StockInfo>>({});
   const [stockLoading, setStockLoading] = useState(true);
   const [stockMessage, setStockMessage] = useState('In Stock. Ready to Ship.');
-  const [selectedMainImage, setSelectedMainImage] = useState(product.image); // Start with white background image
+  const [selectedMainImage, setSelectedMainImage] = useState('/pc3.jpg'); // Start with pc3.jpg
 
-  // Additional product images for gallery (only beach photos)
+  // Additional product images for gallery (beach photos first, then white background)
   const additionalImages = [
     '/pc3.jpg',
     '/pc1.jpg',
     '/pc2.jpg',
-    '/pc4.jpg'
+    '/pc4.jpg',
+    '/IMG_8581-removebg-preview.png'
   ];
 
   const totalPrice = calculatePrice(quantity);
@@ -134,9 +135,9 @@ export default function ProductPage() {
               sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
-          <div className="mt-4 grid grid-cols-4 gap-2">
+          <div className="mt-4 grid grid-cols-5 gap-2">
             {/* Additional images */}
-            {additionalImages.slice(0, 4).map((image, index) => (
+            {additionalImages.map((image, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedMainImage(image)}
