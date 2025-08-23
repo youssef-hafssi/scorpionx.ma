@@ -167,10 +167,7 @@ export default function OrderDetailsPage() {
                     <span>Subtotal:</span>
                     <span>{order.subtotal} DH</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Shipping:</span>
-                    <span>{order.shipping === 0 ? 'Free' : `${order.shipping} DH`}</span>
-                  </div>
+
                   <div className="flex justify-between font-bold text-lg pt-2 border-t">
                     <span>Total:</span>
                     <span>{order.total} DH</span>

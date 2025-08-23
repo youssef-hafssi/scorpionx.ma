@@ -190,10 +190,7 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
-                <div className="flex justify-between">
-                  <span className="text-gray-600 text-sm">Shipping</span>
-                  <span className="font-medium text-sm">0 DH</span>
-                </div>
+
                 <div className="flex justify-between border-t pt-4 text-base font-bold">
                   <span>Total</span>
                   <span>{total} DH</span>

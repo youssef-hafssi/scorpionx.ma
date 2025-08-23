@@ -127,7 +127,7 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4">Ready to Elevate Your Style?</h2>
-            <p className="text-xl mb-8 max-w-2xl mx-auto">Get your ScorpionX clothing today and enjoy free shipping.</p>
+            <p className="text-xl mb-8 max-w-2xl mx-auto">Get your ScorpionX clothing today and enjoy the premium quality products.</p>
           </div>
         </div>
       </section>

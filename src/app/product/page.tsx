@@ -303,14 +303,7 @@ export default function ProductPage() {
               </Button>
             </div>
 
-            <div className="border-t border-b py-3 mt-4">
-              <div className="flex items-center">
-                <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-sm">Free shipping</span>
-              </div>
-            </div>
+
 
             {/* Product Information Sections */}
             <div className="mt-6 space-y-3">

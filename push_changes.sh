@@ -16,27 +16,25 @@ git add .
 
 # Commit changes
 echo "💾 Committing changes..."
-git commit -m "feat: complete product page enhancement with dynamic pricing
+git commit -m "feat: UI improvements and WhatsApp integration
 
-🎯 Product Page Features:
-- Add size guide section with collapsible interface and size images support
-- Implement dynamic pricing system (1=220DH, 2=400DH, 3=580DH, 4+=220DH each)
-- Add special offer pricing table with real-time updates
-- Move product information sections below checkout button
-- Add Arabic translation for shipping & returns policy
-- Add product info, size guide, and shipping collapsible sections
+🎯 Contact & Communication:
+- Add WhatsApp integration for contact number (+212 617 603 374)
+- Contact number now redirects directly to WhatsApp
+- Remove generic phone icon, keep only WhatsApp icon for clarity
 
 🎨 UI/UX Improvements:
-- Update footer to center logo and remove unnecessary sections
-- Keep only Instagram and TikTok social media links
-- Add bulk pricing visual indicators and savings messages
-- Responsive design for mobile and desktop
+- Update CTA section text to emphasize 'premium quality products'
+- Remove all shipping-related text and lines from entire application
+- Remove 'Free shipping' text from product page
+- Remove 'Shipping: 0 DH' from checkout, cart, and order pages
+- Cleaner, more focused pricing display throughout app
 
 🔧 Technical Updates:
-- Dynamic price calculation based on quantity
-- Real-time price updates with quantity changes
-- Support for size guide images (small.jpg, large.jpg, xlarge.jpg, 2xl.jpg)
-- Improved product page layout and organization
+- WhatsApp link format: https://wa.me/212617603374
+- Consistent pricing display across all pages (subtotal → total)
+- Removed shipping calculations from UI (still maintained in backend)
+- Better mobile/desktop WhatsApp integration
 
 🔐 Admin System:
 - Complete admin authentication system

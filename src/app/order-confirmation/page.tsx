@@ -108,10 +108,7 @@ function OrderConfirmationContent() {
                     <span>Subtotal</span>
                     <span>{order.subtotal} DH</span>
                   </div>
-                  <div className="flex justify-between py-1">
-                    <span>Shipping</span>
-                    <span>{order.shipping === 0 ? 'Free' : `${order.shipping} DH`}</span>
-                  </div>
+
                   <div className="flex justify-between py-1">
                     <span>Tax</span>
                     <span>0 DH</span>
