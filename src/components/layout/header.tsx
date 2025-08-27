@@ -13,8 +13,8 @@ import {
 import { useCart } from '@/lib/cart-context';
 
 export function Header() {
-  const { items } = useCart();
-  const itemCount = items.length;
+  const { items, openCartSidebar } = useCart();
+  const itemCount = items.reduce((total, item) => total + item.quantity, 0);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -140,44 +140,20 @@ export function Header() {
 
           <div className="flex-1 flex justify-end items-center gap-4 pr-4 md:pr-8">
             <div className="flex items-center gap-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="relative">
-                    <ShoppingCart className="h-5 w-5" />
-                    {itemCount > 0 && (
-                      <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                        {itemCount}
-                      </span>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  {itemCount > 0 ? (
-                    <>
-                      <div className="p-2">
-                        <p className="text-sm font-medium">{itemCount} item(s) in cart</p>
-                      </div>
-                      <DropdownMenuItem asChild>
-                        <Link href="/cart" className="cursor-pointer w-full">
-                          View Cart
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/checkout" className="cursor-pointer w-full">
-                          Checkout
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  ) : (
-                    <div className="p-2">
-                      <p className="text-sm text-center">Your cart is empty</p>
-                    </div>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Button
+                variant="outline"
+                size="icon"
+                className="relative"
+                onClick={openCartSidebar}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                    {itemCount}
+                  </span>
+                )}
+              </Button>
             </div>
-
-
           </div>
         </div>
       </div>

@@ -77,7 +77,6 @@ export default function ProductPage() {
     for (let i = 0; i < quantity; i++) {
       addItem({ ...product, selectedSize });
     }
-    router.push('/checkout');
   };
 
   const decreaseQuantity = () => {
@@ -300,10 +299,9 @@ export default function ProductPage() {
                 size="lg"
                 className="w-full px-6 py-2 text-sm font-medium"
               >
-                Add to Cart & Checkout
+                Add to Cart
               </Button>
             </div>
-
 
 
             {/* Product Information Sections */}

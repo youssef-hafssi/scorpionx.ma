@@ -21,17 +21,21 @@ export type CartItem = {
 type CartContextType = {
   items: CartItem[];
   addItem: (product: Product) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  removeItem: (productId: string, selectedSize?: string) => void;
+  updateQuantity: (productId: string, quantity: number, selectedSize?: string) => void;
   clearCart: () => void;
   subtotal: number;
   checkStockAvailability: () => Promise<{ available: boolean; details: any[] }>;
+  isCartSidebarOpen: boolean;
+  openCartSidebar: () => void;
+  closeCartSidebar: () => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [isCartSidebarOpen, setIsCartSidebarOpen] = useState(false);
   
   // Load cart from localStorage on initial render
   useEffect(() => {
@@ -52,36 +56,62 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = (product: Product) => {
     setItems(prevItems => {
-      const existingItem = prevItems.find(item => item.product.id === product.id);
-      
+      const existingItem = prevItems.find(item =>
+        item.product.id === product.id &&
+        item.product.selectedSize === product.selectedSize
+      );
+
       if (existingItem) {
         return prevItems.map(item =>
-          item.product.id === product.id
+          item.product.id === product.id && item.product.selectedSize === product.selectedSize
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
-      
+
       return [...prevItems, { product, quantity: 1 }];
     });
+
+    // Open cart sidebar when item is added
+    setIsCartSidebarOpen(true);
   };
 
-  const removeItem = (productId: string) => {
-    setItems(prevItems => prevItems.filter(item => item.product.id !== productId));
+  const openCartSidebar = () => {
+    setIsCartSidebarOpen(true);
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const closeCartSidebar = () => {
+    setIsCartSidebarOpen(false);
+  };
+
+  const removeItem = (productId: string, selectedSize?: string) => {
+    setItems(prevItems =>
+      prevItems.filter(item => {
+        if (selectedSize) {
+          return !(item.product.id === productId && item.product.selectedSize === selectedSize);
+        }
+        return item.product.id !== productId;
+      })
+    );
+  };
+
+  const updateQuantity = (productId: string, quantity: number, selectedSize?: string) => {
     if (quantity <= 0) {
-      removeItem(productId);
+      removeItem(productId, selectedSize);
       return;
     }
-    
+
     setItems(prevItems =>
-      prevItems.map(item =>
-        item.product.id === productId
+      prevItems.map(item => {
+        if (selectedSize) {
+          return item.product.id === productId && item.product.selectedSize === selectedSize
+            ? { ...item, quantity }
+            : item;
+        }
+        return item.product.id === productId
           ? { ...item, quantity }
-          : item
-      )
+          : item;
+      })
     );
   };
 
@@ -135,6 +165,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         subtotal,
         checkStockAvailability,
+        isCartSidebarOpen,
+        openCartSidebar,
+        closeCartSidebar,
       }}
     >
       {children}

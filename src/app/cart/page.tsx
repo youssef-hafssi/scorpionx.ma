@@ -29,9 +29,9 @@ export default function CartPage() {
     }
   };
   
-  const handleQuantityChange = (id: string, newQuantity: number) => {
+  const handleQuantityChange = (id: string, newQuantity: number, selectedSize?: string) => {
     if (newQuantity < 1) return;
-    updateQuantity(id, newQuantity);
+    updateQuantity(id, newQuantity, selectedSize);
   };
   
   if (items.length === 0) {
@@ -57,7 +57,7 @@ export default function CartPage() {
             <CardContent className="p-6">
               <div className="space-y-6">
                 {items.map((item) => (
-                  <div key={item.product.id} className="flex flex-col sm:flex-row border-b pb-6">
+                  <div key={`${item.product.id}-${item.product.selectedSize}`} className="flex flex-col sm:flex-row border-b pb-6">
                     <div className="w-full sm:w-24 h-24 relative mb-4 sm:mb-0">
                       <Image
                         src={item.product.image}
@@ -69,7 +69,10 @@ export default function CartPage() {
 
                     <div className="flex-1 sm:ml-6">
                       <div className="flex justify-between">
-                        <h3 className="font-semibold text-lg">{item.product.name}</h3>
+                        <div>
+                          <h3 className="font-semibold text-lg">{item.product.name}</h3>
+                          <p className="text-gray-500 text-sm">Size: {item.product.selectedSize}</p>
+                        </div>
                         <p className="font-semibold">
                           {totalQuantity > 1 ?
                             `${(subtotal / totalQuantity * item.quantity).toFixed(0)} DH` :
@@ -88,14 +91,14 @@ export default function CartPage() {
                       <div className="flex items-center justify-between mt-4">
                         <div className="flex items-center border rounded-md">
                           <button
-                            onClick={() => handleQuantityChange(item.product.id, item.quantity - 1)}
+                            onClick={() => handleQuantityChange(item.product.id, item.quantity - 1, item.product.selectedSize)}
                             className="px-3 py-1 border-r"
                           >
                             -
                           </button>
                           <span className="px-4 py-1">{item.quantity}</span>
                           <button
-                            onClick={() => handleQuantityChange(item.product.id, item.quantity + 1)}
+                            onClick={() => handleQuantityChange(item.product.id, item.quantity + 1, item.product.selectedSize)}
                             className="px-3 py-1 border-l"
                           >
                             +
@@ -103,7 +106,7 @@ export default function CartPage() {
                         </div>
 
                         <button
-                          onClick={() => removeItem(item.product.id)}
+                          onClick={() => removeItem(item.product.id, item.product.selectedSize)}
                           className="text-red-500 hover:text-red-700"
                         >
                           Remove

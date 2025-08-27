@@ -3,6 +3,8 @@
 import { usePathname } from 'next/navigation';
 import { Header } from './header';
 import { Footer } from './footer';
+import { CartSidebar } from '../cart-sidebar';
+import { useCart } from '@/lib/cart-context';
 
 interface ConditionalLayoutProps {
   children: React.ReactNode;
@@ -11,6 +13,7 @@ interface ConditionalLayoutProps {
 export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname();
   const isAdminPage = pathname.startsWith('/admin');
+  const { isCartSidebarOpen, closeCartSidebar } = useCart();
 
   if (isAdminPage) {
     // Admin pages don't need the main site header and footer
@@ -36,6 +39,9 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
       <Header />
       <main className="flex-1" style={{ paddingTop: '116px' }}>{children}</main>
       <Footer />
+
+      {/* Cart Sidebar */}
+      <CartSidebar isOpen={isCartSidebarOpen} onClose={closeCartSidebar} />
     </div>
   );
 }
