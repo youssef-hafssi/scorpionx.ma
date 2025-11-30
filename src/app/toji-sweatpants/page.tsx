@@ -426,10 +426,10 @@ function SizeGuideSection() {
   const [isOpen, setIsOpen] = useState(false);
 
   const sizeGuideImages = [
-    { size: 'Small', image: '/small.png' },
-    { size: 'Medium', image: '/medium.png' },
-    { size: 'Large', image: '/large.png' },
-    { size: 'XL', image: '/xlarge.png' }
+    { size: 'Small', image: '/SMALL.png' },
+    { size: 'Medium', image: '/MEDIUM.png' },
+    { size: 'Large', image: '/LARGE.png' },
+    { size: 'XL', image: '/XLARGE.png' }
   ];
 
   return (
