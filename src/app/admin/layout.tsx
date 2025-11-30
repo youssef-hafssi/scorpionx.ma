@@ -20,18 +20,17 @@ export default function AdminLayout({
             <Link href="/admin" className="text-xl font-bold text-gray-900">
               ScorpionX Admin Dashboard
             </Link>
-            <span className="text-gray-400">|</span>
-            <h1 className="text-lg font-semibold text-gray-900">
+            <span className="text-gray-400">|</span>            <h1 className="text-lg font-semibold text-gray-900">
               {pathname === '/admin' ? 'Dashboard' :
                pathname.startsWith('/admin/orders/') ? 'Order Details' :
                pathname === '/admin/orders' ? 'Orders Management' :
                pathname === '/admin/stock' ? 'Stock Management' :
+               pathname === '/admin/coupons' ? 'Coupon Management' :
                'Admin Panel'}
             </h1>
           </div>
 
-          <div className="flex items-center space-x-4">
-            {/* Navigation Links */}
+          <div className="flex items-center space-x-4">            {/* Navigation Links */}
             <div className="flex items-center space-x-2">
               <Link href="/admin/orders">
                 <Button
@@ -47,6 +46,14 @@ export default function AdminLayout({
                   size="sm"
                 >
                   Stock
+                </Button>
+              </Link>
+              <Link href="/admin/coupons">
+                <Button
+                  variant={pathname === '/admin/coupons' ? 'default' : 'ghost'}
+                  size="sm"
+                >
+                  Coupons
                 </Button>
               </Link>
             </div>

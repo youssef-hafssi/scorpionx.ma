@@ -7,15 +7,32 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/lib/cart-context';
-import { calculatePrice } from '@/lib/pricing';
+import { calculateProductPrice } from '@/lib/pricing';
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, clearCart } = useCart();
   const [promoCode, setPromoCode] = useState('');
   const [promoApplied, setPromoApplied] = useState(false);
-  // Calculate cart totals using dynamic pricing
+  
+  // Calculate cart totals using product-specific dynamic pricing
   const totalQuantity = items.reduce((total, item) => total + item.quantity, 0);
-  const subtotal = calculatePrice(totalQuantity);
+  
+  // Group items by product ID to apply bulk pricing correctly
+  const productGroups = items.reduce((groups, item) => {
+    const productId = item.product.id;
+    if (!groups[productId]) {
+      groups[productId] = { items: [], totalQuantity: 0 };
+    }
+    groups[productId].items.push(item);
+    groups[productId].totalQuantity += item.quantity;
+    return groups;
+  }, {} as Record<string, { items: typeof items, totalQuantity: number }>);
+
+  // Calculate subtotal by applying bulk pricing per product
+  const subtotal = Object.entries(productGroups).reduce((total, [productId, group]) => {
+    return total + calculateProductPrice(productId, group.totalQuantity);
+  }, 0);
+  
   const discount = promoApplied ? subtotal * 0.1 : 0; // 10% discount if promo applied
   const shipping: number = 0; // Fixed at 0DH to match checkout
   const tax: number = 0; // Remove tax to match checkout
@@ -38,9 +55,8 @@ export default function CartPage() {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-3xl font-bold mb-6">Your Cart is Empty</h1>
-        <p className="text-gray-600 mb-8">Looks like you haven't added anything to your cart yet.</p>
-        <Link href="/product">
-          <Button size="lg">Continue Shopping</Button>
+        <p className="text-gray-600 mb-8">Looks like you haven't added anything to your cart yet.</p>        <Link href="/collection">
+          <Button size="lg">Start Shopping</Button>
         </Link>
       </div>
     );
@@ -124,8 +140,7 @@ export default function CartPage() {
                 >
                   Clear Cart
                 </Button>
-                
-                <Link href="/product">
+                  <Link href="/collection">
                   <Button variant="outline">Continue Shopping</Button>
                 </Link>
               </div>

@@ -5,45 +5,74 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/lib/cart-context';
-import { product } from '@/lib/product-data';
-import { calculatePrice, getPricePerItem } from '@/lib/pricing';
-
+import { calculateTojiPrice, getTojiPricePerItem } from '@/lib/pricing';
 
 interface StockInfo {
   available: boolean;
   quantity: number;
 }
 
-export default function ProductPage() {
+interface ProductData {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  originalPrice?: number;
+  image: string;
+}
+
+export default function TojiSweatpantsPage() {
   const router = useRouter();
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('');
   const [stockData, setStockData] = useState<Record<string, StockInfo>>({});
-  const [stockLoading, setStockLoading] = useState(true);
-  const [stockMessage, setStockMessage] = useState('In Stock. Ready to Ship.');
-  const [selectedMainImage, setSelectedMainImage] = useState('/pc3.jpg'); // Start with pc3.jpg
+  const [stockLoading, setStockLoading] = useState(true); const [stockMessage, setStockMessage] = useState('In Stock. Ready to Ship.');
+  const [selectedMainImage, setSelectedMainImage] = useState('/34.jpeg');
+  const productSizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
-  // Additional product images for gallery (beach photos first, then white background)
+  // Hardcoded product data
+  const productData: ProductData = {
+    id: 'toji-sweatpants',
+    name: 'Toji Sweatpants',
+    description: `Made for Those who mix comfort, power & style
+
+• Fit: Baggy / Comfortable
+• Style: Suit Pants – inspired by Toji's look
+• Use: Multi-purpose (Gym / Streetwear / Casual)
+• Comfort: Soft fabric with natural stretch for all-day wear
+• Waist: Elastic waistband with drawstring for adjustable fit
+• Care: Machine wash cold – Do not bleach – Iron low
+• Gender: Unisex
+
+Premium streetwear comfort meets Islamic modesty. The ultimate sweatpants designed for brothers who value both style and faith. These versatile pants are perfect for the gym, casual outings, or everyday wear while maintaining a loose, modest fit that adheres to Islamic guidelines.`,
+    price: 250,
+    originalPrice: 320,
+    image: '/34.jpeg'
+  };
+
+  // Product images for gallery
   const additionalImages = [
-    '/pc3.jpg',
-    '/pc1.jpg',
-    '/pc2.jpg',
-    '/pc4.jpg',
-    '/IMG_8581-removebg-preview.png'
+    '/32.jpeg',
+    '/34.jpeg',
+    '/36.jpeg',
+    '/37.jpeg',
   ];
-  const totalPrice = calculatePrice(quantity);
-  const pricePerItem = getPricePerItem(quantity);
 
-  // Fetch stock data
+  const totalPrice = calculateTojiPrice(quantity);
+  const pricePerItem = getTojiPricePerItem(quantity);
+
+  // Fetch only stock data from database
   useEffect(() => {
     const fetchStock = async () => {
       try {
-        const response = await fetch('/api/product-stock?productId=vintage-cargo-pants');
+        const response = await fetch('/api/product-stock?productId=toji-sweatpants');
         if (response.ok) {
           const data = await response.json();
           setStockData(data.stockInfo);
           setStockMessage(data.message);
+        } else {
+          console.error('Failed to fetch stock data');
         }
       } catch (error) {
         console.error('Error fetching stock:', error);
@@ -53,9 +82,7 @@ export default function ProductPage() {
     };
 
     fetchStock();
-  }, []);
-
-  const handleAddToCart = () => {
+  }, []); const handleAddToCart = () => {
     if (!selectedSize) {
       alert('Please select a size');
       return;
@@ -74,7 +101,16 @@ export default function ProductPage() {
     }
 
     for (let i = 0; i < quantity; i++) {
-      addItem({ ...product, selectedSize });
+      addItem({
+        id: productData.id,
+        name: productData.name,
+        price: productData.price,
+        originalPrice: productData.originalPrice,
+        image: productData.image,
+        description: productData.description,
+        sizes: productSizes,
+        selectedSize
+      });
     }
   };
 
@@ -92,7 +128,6 @@ export default function ProductPage() {
       setQuantity(quantity + 1);
     }
   };
-
   return (
     <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
@@ -115,18 +150,33 @@ export default function ProductPage() {
               />
             </svg>
           </li>
-          <li className="text-gray-700">Product</li>
+          <li className="flex items-center">
+            <a href="/collection" className="text-gray-500 hover:text-gray-700">Collection</a>
+            <svg
+              className="mx-2 h-4 w-4 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </li>
+          <li className="text-gray-700">{productData.name}</li>
         </ol>
-      </nav>
-
-      {/* Product Details */}
+      </nav>      {/* Product Details */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Product Image */}
         <div className="bg-white p-4 rounded-lg shadow-sm">
           <div className="relative aspect-square overflow-hidden rounded-lg border">
             <Image
               src={selectedMainImage}
-              alt={product.name}
+              alt={productData.name}
               fill
               className="object-contain p-4"
               priority
@@ -139,16 +189,15 @@ export default function ProductPage() {
               <button
                 key={index}
                 onClick={() => setSelectedMainImage(image)}
-                className={`border-2 rounded-md overflow-hidden transition-colors ${
-                  selectedMainImage === image
-                    ? 'border-primary'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
+                className={`border-2 rounded-md overflow-hidden transition-colors ${selectedMainImage === image
+                  ? 'border-primary'
+                  : 'border-gray-200 hover:border-gray-300'
+                  }`}
               >
                 <div className="aspect-square relative">
                   <Image
                     src={image}
-                    alt={`${product.name} - Additional Image ${index + 1}`}
+                    alt={`${productData.name} - Additional Image ${index + 1}`}
                     fill
                     className="object-cover p-2"
                     sizes="(max-width: 768px) 25vw, 12vw"
@@ -157,12 +206,10 @@ export default function ProductPage() {
               </button>
             ))}
           </div>
-        </div>
-
-        {/* Product Info */}
+        </div>        {/* Product Info */}
         <div className="bg-white p-4 rounded-lg shadow-sm">
-          <h1 className="text-2xl font-bold text-gray-900">{product.name}</h1>
-          
+          <h1 className="text-2xl font-bold text-gray-900">{productData.name}</h1>
+
           <div className="mt-3 flex items-center">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
@@ -172,35 +219,30 @@ export default function ProductPage() {
               ))}
             </div>
           </div>
-          
+
           <div className="mt-4 space-y-1">
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-bold text-gray-900">{totalPrice} DH</span>
-              {quantity > 1 && (
-                <span className="text-base text-gray-600">({pricePerItem.toFixed(0)} DH each)</span>
-              )}
             </div>
             {quantity > 1 && (
               <div className="text-sm text-green-600 font-medium">
                 💰 Special bulk pricing applied!
               </div>
-            )}
-
-            {/* Special Offer Table */}
+            )}            {/* Special Offer Table */}
             <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
               <h4 className="text-sm font-medium text-blue-900 mb-2">💡 SPECIAL OFFER:</h4>
               <div className="grid grid-cols-1 gap-2 text-xs">
                 <div className={`flex justify-between p-2 rounded ${quantity === 1 ? 'bg-blue-100 font-medium' : ''}`}>
                   <span>1 item:</span>
-                  <span>220 DH</span>
+                  <span>250 DH</span>
                 </div>
                 <div className={`flex justify-between p-2 rounded ${quantity === 2 ? 'bg-blue-100 font-medium' : ''}`}>
                   <span>2 items:</span>
-                  <span>400 DH</span>
+                  <span>460 DH</span>
                 </div>
                 <div className={`flex justify-between p-2 rounded ${quantity === 3 ? 'bg-blue-100 font-medium' : ''}`}>
                   <span>3 items:</span>
-                  <span>580 DH</span>
+                  <span>670 DH</span>
                 </div>
               </div>
             </div>
@@ -211,7 +253,7 @@ export default function ProductPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Size</label>
                 <div className="flex gap-2 flex-wrap">
-                  {product.sizes.map((size) => {
+                  {productSizes.map((size) => {
                     const isSelected = selectedSize === size;
                     const sizeStock = stockData[size];
                     const isUnavailable = !stockLoading && (!sizeStock || !sizeStock.available);
@@ -226,8 +268,8 @@ export default function ProductPage() {
                           ${isSelected
                             ? 'bg-black text-white border-black'
                             : isUnavailable
-                            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed line-through'
-                            : 'bg-white text-gray-900 border-gray-300 hover:border-gray-400'
+                              ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed line-through'
+                              : 'bg-white text-gray-900 border-gray-300 hover:border-gray-400'
                           }
                         `}
                         title={
@@ -251,16 +293,14 @@ export default function ProductPage() {
                     </>
                   ) : (
                     <>
-                      <div className={`w-2 h-2 rounded-full mr-2 ${
-                        stockMessage.includes('out of stock')
-                          ? 'bg-red-500'
-                          : 'bg-green-500'
-                      }`}></div>
-                      <span className={`text-sm font-medium ${
-                        stockMessage.includes('out of stock')
-                          ? 'text-red-600'
-                          : 'text-green-600'
-                      }`}>
+                      <div className={`w-2 h-2 rounded-full mr-2 ${stockMessage.includes('out of stock')
+                        ? 'bg-red-500'
+                        : 'bg-green-500'
+                        }`}></div>
+                      <span className={`text-sm font-medium ${stockMessage.includes('out of stock')
+                        ? 'text-red-600'
+                        : 'text-green-600'
+                        }`}>
                         {stockMessage}
                       </span>
                     </>
@@ -269,7 +309,7 @@ export default function ProductPage() {
               </div>
 
 
-              
+
               <div className="flex items-center space-x-3">
                 <span className="text-sm text-gray-700 font-medium">Quantity:</span>
                 <div className="flex items-center border-2 rounded-md">
@@ -287,10 +327,9 @@ export default function ProductPage() {
                     aria-label="Increase quantity"
                   >
                     +
-                  </button>
-                </div>              </div>
+                  </button>                </div>              </div>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-3 mt-6">
               <Button
                 onClick={handleAddToCart}
@@ -333,12 +372,10 @@ export default function ProductPage() {
                   <h3 className="text-xs font-medium text-gray-900 mb-1">Built to Last</h3>
                   <p className="text-xs text-gray-600">Premium quality</p>
                 </div>
-              </div>
-
-              {/* Collapsible Sections */}
+              </div>              {/* Collapsible Sections */}
               <div className="space-y-2">
                 {/* Product Info Section */}
-                <ProductInfoSection />
+                <ProductInfoSection description={productData.description} />
 
                 {/* Size Guide Section */}
                 <SizeGuideSection />
@@ -350,13 +387,12 @@ export default function ProductPage() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }
 
 // Product Info Collapsible Section
-function ProductInfoSection() {
+function ProductInfoSection({ description }: { description: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -374,11 +410,10 @@ function ProductInfoSection() {
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
         </svg>
-      </button>
-      {isOpen && (
+      </button>      {isOpen && (
         <div className="px-6 pb-6 border-t border-gray-200">
           <div className="pt-4 text-sm text-gray-600">
-            <p className="leading-relaxed">{product.description}</p>
+            <div className="leading-relaxed whitespace-pre-line">{description}</div>
           </div>
         </div>
       )}
@@ -391,10 +426,10 @@ function SizeGuideSection() {
   const [isOpen, setIsOpen] = useState(false);
 
   const sizeGuideImages = [
-    { size: 'Small', image: '/small.jpg' },
-    { size: 'Large', image: '/large.jpg' },
-    { size: 'XL', image: '/xlarge.jpg' },
-    { size: '2XL', image: '/2xl.jpg' }
+    { size: 'Small', image: '/toji-small.jpg' },
+    { size: 'Medium', image: '/toji-medium.jpg' },
+    { size: 'Large', image: '/toji-large.jpg' },
+    { size: 'XL', image: '/toji-xl.jpg' }
   ];
 
   return (

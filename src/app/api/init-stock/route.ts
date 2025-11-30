@@ -60,10 +60,8 @@ export async function POST() {
       const stockData = [
         { product_id: 'vintage-cargo-pants', size: 'S', quantity: 25, low_stock_threshold: 5 },
         { product_id: 'vintage-cargo-pants', size: 'M', quantity: 30, low_stock_threshold: 5 },
-        { product_id: 'vintage-cargo-pants', size: 'L', quantity: 35, low_stock_threshold: 5 },
-        { product_id: 'vintage-cargo-pants', size: 'XL', quantity: 20, low_stock_threshold: 5 },
-        { product_id: 'vintage-cargo-pants', size: 'XXL', quantity: 15, low_stock_threshold: 5 },
-        { product_id: 'vintage-cargo-pants', size: '3XL', quantity: 10, low_stock_threshold: 5 }
+        { product_id: 'vintage-cargo-pants', size: 'L', quantity: 35, low_stock_threshold: 5 },        { product_id: 'vintage-cargo-pants', size: 'XL', quantity: 20, low_stock_threshold: 5 },
+        { product_id: 'vintage-cargo-pants', size: 'XXL', quantity: 15, low_stock_threshold: 5 }
       ];
 
       const { error: stockError } = await supabase

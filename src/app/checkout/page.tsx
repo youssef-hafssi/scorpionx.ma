@@ -9,12 +9,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCart } from '@/lib/cart-context';
 import { useOrders } from '@/lib/order-context';
-import { calculatePrice } from '@/lib/pricing';
+import { useCoupon } from '@/lib/coupon-context';
+import { CouponInput } from '@/components/coupon-input';
+import { calculateProductPrice } from '@/lib/pricing';
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, clearCart } = useCart();
   const { addOrder } = useOrders();
+  const { appliedCoupon, calculateDiscount } = useCoupon();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [customerInfo, setCustomerInfo] = useState({
@@ -23,19 +26,34 @@ export default function CheckoutPage() {
     deliveryAddress: '',
     email: ''
   });
-
-  // Calculate cart totals using dynamic pricing
+  // Calculate cart totals using product-specific dynamic pricing
   const totalQuantity = items.reduce((total, item) => total + item.quantity, 0);
-  const subtotal = calculatePrice(totalQuantity);
+  
+  // Group items by product ID to apply bulk pricing correctly
+  const productGroups = items.reduce((groups, item) => {
+    const productId = item.product.id;
+    if (!groups[productId]) {
+      groups[productId] = { items: [], totalQuantity: 0 };
+    }
+    groups[productId].items.push(item);
+    groups[productId].totalQuantity += item.quantity;
+    return groups;
+  }, {} as Record<string, { items: typeof items, totalQuantity: number }>);
+
+  // Calculate subtotal by applying bulk pricing per product
+  const subtotal = Object.entries(productGroups).reduce((total, [productId, group]) => {
+    return total + calculateProductPrice(productId, group.totalQuantity);
+  }, 0);
+  
+  const discount = calculateDiscount(subtotal);
   const shipping = 0; // Fixed at 0DH
-  const total = subtotal + shipping;
+  const total = subtotal - discount + shipping;
   
   const handleInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCustomerInfo(prev => ({ ...prev, [name]: value }));
   };
-  
-  const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate required fields
@@ -45,10 +63,17 @@ export default function CheckoutPage() {
     }
 
     try {
-      setIsSubmitting(true);
+      setIsSubmitting(true);      // Create the order with coupon info
+      const orderId = await addOrder(customerInfo, items, { 
+        subtotal, 
+        shipping, 
+        total,
+        discount,
+        couponCode: appliedCoupon?.code
+      });
 
-      // Create the order
-      const orderId = await addOrder(customerInfo, items, { subtotal, shipping, total });
+      // Note: Coupon usage will be tracked when order status changes to "Delivered"
+      // This prevents counting undelivered orders against coupon usage limits
 
       // Clear cart and redirect
       clearCart();
@@ -65,8 +90,7 @@ export default function CheckoutPage() {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-3xl font-bold mb-6">Your Cart is Empty</h1>
-        <p className="text-gray-600 mb-8">You need to add items to your cart before checkout.</p>
-        <Link href="/product">
+        <p className="text-gray-600 mb-8">You need to add items to your cart before checkout.</p>        <Link href="/collection">
           <Button size="lg">Shop Now</Button>
         </Link>
       </div>
@@ -161,6 +185,9 @@ export default function CheckoutPage() {
                     <span className="text-gray-600 text-xs">Size: {item.product.selectedSize}</span>
                   </div>
                 ))}
+              </div>              {/* Coupon Code Section */}
+              <div className="border-t mt-4 pt-4">
+                <CouponInput />
               </div>
 
               {/* Pricing breakdown with bulk discount info */}
@@ -190,10 +217,16 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
+                {discount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span className="text-sm">Discount</span>
+                    <span className="font-medium text-sm">-{discount.toFixed(2)} DH</span>
+                  </div>
+                )}
 
                 <div className="flex justify-between border-t pt-4 text-base font-bold">
                   <span>Total</span>
-                  <span>{total} DH</span>
+                  <span>{total.toFixed(2)} DH</span>
                 </div>
               </div>
             </CardContent>

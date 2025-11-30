@@ -66,8 +66,7 @@ INSERT INTO product_stock (product_id, size, quantity, low_stock_threshold) VALU
 ('vintage-cargo-pants', 'M', 30, 5),
 ('vintage-cargo-pants', 'L', 35, 5),
 ('vintage-cargo-pants', 'XL', 20, 5),
-('vintage-cargo-pants', 'XXL', 15, 5),
-('vintage-cargo-pants', '3XL', 10, 5)
+('vintage-cargo-pants', 'XXL', 15, 5)
 ON CONFLICT (product_id, size) DO UPDATE SET
   quantity = EXCLUDED.quantity,
   low_stock_threshold = EXCLUDED.low_stock_threshold,

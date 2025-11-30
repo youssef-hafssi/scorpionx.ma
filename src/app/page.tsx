@@ -33,13 +33,12 @@ export default function Home() {
                 className="object-contain"
                 priority
               />
-            </div>
-            <p className="text-xl md:text-2xl text-gray-200 max-w-2xl mx-auto">
+            </div>            <p className="text-xl md:text-2xl text-gray-200 max-w-2xl mx-auto">
               Discover premium streetwear and fashion that defines your style.
               Featuring high-quality fabrics and contemporary designs.
             </p>
             <div className="flex justify-center pt-4">
-              <Link href="/product">
+              <Link href="/collection">
                 <Button size="lg" className="bg-white text-black hover:bg-gray-100">
                   Shop Now
                 </Button>
@@ -112,8 +111,7 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="mt-12 text-center">
-            <Link href="/product">
+          <div className="mt-12 text-center">            <Link href="/awrah-cover">
               <Button>
                 Shop Now
               </Button>

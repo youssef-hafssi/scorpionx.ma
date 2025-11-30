@@ -51,19 +51,16 @@ export function Header() {
                     />
                   </svg>
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56">
+              </DropdownMenuTrigger>              <DropdownMenuContent align="start" className="w-56">
                 <DropdownMenuItem asChild>
                   <Link href="/" className="cursor-pointer w-full">Home</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/product" className="cursor-pointer w-full">Product</Link>
+                  <Link href="/collection" className="cursor-pointer w-full">Collection</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
-
-          <div className="flex-1 flex justify-start pl-4 md:pl-8">
+          </div>          <div className="flex-1 flex justify-start pl-4 md:pl-8">
             <nav className="hidden md:block">
               <ul className="flex items-center gap-6 text-sm">
                 <li>
@@ -76,10 +73,10 @@ export function Header() {
                 </li>
                 <li>
                   <Link
-                    href="/product"
+                    href="/collection"
                     className="text-gray-500 transition hover:text-gray-500/75"
                   >
-                    Product
+                    Collection
                   </Link>
                 </li>
               </ul>

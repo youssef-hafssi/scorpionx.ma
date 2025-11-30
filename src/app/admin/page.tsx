@@ -136,11 +136,16 @@ export default function AdminDashboard() {
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 Manage Orders
               </Button>
-            </Link>
-            <Link href="/admin/stock">
+            </Link>            <Link href="/admin/stock">
               <Button className="w-full justify-start" variant="outline">
                 <Package className="h-4 w-4 mr-2" />
                 Manage Stock
+              </Button>
+            </Link>
+            <Link href="/admin/coupons">
+              <Button className="w-full justify-start" variant="outline">
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Manage Coupons
               </Button>
             </Link>
           </CardContent>

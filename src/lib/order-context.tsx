@@ -20,6 +20,8 @@ export type Order = {
   items: CartItem[];
   subtotal: number;
   shipping: number;
+  discount?: number;
+  couponCode?: string;
   total: number;
   status: OrderStatus;
   orderDate: Date;
@@ -37,6 +39,8 @@ export type DbOrder = {
   delivery_address: string;
   subtotal: number;
   shipping: number;
+  discount_amount?: number;
+  coupon_code?: string;
   total: number;
   status: OrderStatus;
   notes: string | null;
@@ -59,7 +63,7 @@ export type DbOrderItem = {
 type OrderContextType = {
   orders: Order[];
   loading: boolean;
-  addOrder: (customerInfo: CustomerInfo, items: CartItem[], totals: { subtotal: number; shipping: number; total: number }) => Promise<string>;
+  addOrder: (customerInfo: CustomerInfo, items: CartItem[], totals: { subtotal: number; shipping: number; total: number; discount?: number; couponCode?: string }) => Promise<string>;
   updateOrderStatus: (orderId: string, status: OrderStatus, notes?: string) => Promise<void>;
   getOrder: (orderId: string) => Order | undefined;
   getNewOrdersCount: () => number;
@@ -86,7 +90,6 @@ const convertDbOrderToOrder = (dbOrder: DbOrder, dbOrderItems: DbOrderItem[]): O
     },
     quantity: item.quantity,
   }));
-
   return {
     id: dbOrder.id,
     orderNumber: dbOrder.order_number,
@@ -99,6 +102,8 @@ const convertDbOrderToOrder = (dbOrder: DbOrder, dbOrderItems: DbOrderItem[]): O
     items,
     subtotal: dbOrder.subtotal,
     shipping: dbOrder.shipping,
+    discount: dbOrder.discount_amount || 0,
+    couponCode: dbOrder.coupon_code || undefined,
     total: dbOrder.total,
     status: dbOrder.status,
     orderDate: new Date(dbOrder.created_at),
@@ -324,8 +329,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       throw error;
     }
   };
-
-  const addOrder = async (customerInfo: CustomerInfo, items: CartItem[], totals: { subtotal: number; shipping: number; total: number }): Promise<string> => {
+  const addOrder = async (customerInfo: CustomerInfo, items: CartItem[], totals: { subtotal: number; shipping: number; total: number; discount?: number; couponCode?: string }): Promise<string> => {
     try {
       // Validate required fields
       const requiredFields = ['fullName', 'phoneNumber', 'deliveryAddress'];
@@ -361,6 +365,8 @@ export function OrderProvider({ children }: { children: ReactNode }) {
           delivery_address: customerInfo.deliveryAddress,
           subtotal: totals.subtotal,
           shipping: totals.shipping,
+          discount_amount: totals.discount || 0,
+          coupon_code: totals.couponCode || null,
           total: totals.total,
           status: 'Pending',
         })
@@ -480,6 +486,46 @@ export function OrderProvider({ children }: { children: ReactNode }) {
           : order
       );
       setOrders(updatedOrders);
+
+      // Handle coupon usage tracking based on status changes
+      if (status === 'Delivered' && oldStatus !== 'Delivered' && currentOrder?.couponCode) {
+        // Mark coupon as used when order is delivered
+        try {
+          await fetch('/api/coupons/use', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              couponCode: currentOrder.couponCode,
+              orderId: currentOrder.id,
+              orderNumber: currentOrder.orderNumber,
+              discountAmount: currentOrder.discount || 0
+            })
+          });
+          console.log('Coupon usage tracked for delivered order:', currentOrder.orderNumber);
+        } catch (couponError) {
+          console.error('Failed to track coupon usage on delivery:', couponError);
+          // Don't throw - order status update should succeed even if coupon tracking fails
+        }
+      }
+
+      // Handle coupon usage reversal for cancelled orders (if they were delivered)
+      if (status === 'Canceled' && oldStatus === 'Delivered' && currentOrder?.couponCode) {
+        try {
+          await fetch('/api/coupons/reverse', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              couponCode: currentOrder.couponCode,
+              orderId: currentOrder.id,
+              orderNumber: currentOrder.orderNumber
+            })
+          });
+          console.log('Coupon usage reversed for cancelled delivered order:', currentOrder.orderNumber);
+        } catch (couponError) {
+          console.error('Failed to reverse coupon usage:', couponError);
+          // Don't throw - status update should succeed even if coupon reversal fails
+        }
+      }
 
       // Handle stock restoration for cancelled orders
       if (status === 'Canceled' && oldStatus !== 'Canceled') {

@@ -36,7 +36,7 @@ In your Vercel dashboard, go to **Settings** → **Environment Variables** and a
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://mrclbohwhgupznatejha.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1yY2xib2h3aGd1cHpuYXRlamhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTU5NjIsImV4cCI6MjA2OTI5MTk2Mn0.VdTDKthYiQkBsWpzRp7kUGCODBzsUE9Gg_T0mIfwr6E
-TELEGRAM_BOT_TOKEN=8262973860:AAEQ2xfR3M1Tb0dSxvws6hMU_IMbBKnM1Nk
+TELEGRAM_BOT_TOKEN=8134139855:AAF7cGD9GswVbAcQXvCJEKwvRFWgCnIUojk
 TELEGRAM_CHAT_ID=1194739533
 JWT_SECRET=scorpionx-super-secret-jwt-key-for-admin-auth-2025
 ```

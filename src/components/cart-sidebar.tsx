@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/lib/cart-context';
-import { calculatePrice } from '@/lib/pricing';
+import { calculateProductPrice } from '@/lib/pricing';
 import { X, ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react';
 
 interface CartSidebarProps {
@@ -26,9 +26,24 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     }
   }, [isOpen]);
 
-  // Calculate cart totals using dynamic pricing
+  // Calculate cart totals using product-specific dynamic pricing
   const totalQuantity = items.reduce((total, item) => total + item.quantity, 0);
-  const subtotal = calculatePrice(totalQuantity);
+  
+  // Group items by product ID to apply bulk pricing correctly
+  const productGroups = items.reduce((groups, item) => {
+    const productId = item.product.id;
+    if (!groups[productId]) {
+      groups[productId] = { items: [], totalQuantity: 0 };
+    }
+    groups[productId].items.push(item);
+    groups[productId].totalQuantity += item.quantity;
+    return groups;
+  }, {} as Record<string, { items: typeof items, totalQuantity: number }>);
+
+  // Calculate subtotal by applying bulk pricing per product
+  const subtotal = Object.entries(productGroups).reduce((total, [productId, group]) => {
+    return total + calculateProductPrice(productId, group.totalQuantity);
+  }, 0);
 
   if (!isVisible) return null;
 

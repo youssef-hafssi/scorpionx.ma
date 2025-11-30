@@ -14,7 +14,7 @@ interface StockInfo {
   quantity: number;
 }
 
-export default function ProductPage() {
+export default function AwrahCoverPage() {
   const router = useRouter();
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -32,6 +32,7 @@ export default function ProductPage() {
     '/pc4.jpg',
     '/IMG_8581-removebg-preview.png'
   ];
+
   const totalPrice = calculatePrice(quantity);
   const pricePerItem = getPricePerItem(quantity);
 
@@ -115,7 +116,24 @@ export default function ProductPage() {
               />
             </svg>
           </li>
-          <li className="text-gray-700">Product</li>
+          <li className="flex items-center">
+            <a href="/collection" className="text-gray-500 hover:text-gray-700">Collection</a>
+            <svg
+              className="mx-2 h-4 w-4 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </li>
+          <li className="text-gray-700">{product.name}</li>
         </ol>
       </nav>
 
@@ -288,7 +306,8 @@ export default function ProductPage() {
                   >
                     +
                   </button>
-                </div>              </div>
+                </div>
+              </div>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-3 mt-6">
