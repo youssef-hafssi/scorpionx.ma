@@ -426,10 +426,10 @@ function SizeGuideSection() {
   const [isOpen, setIsOpen] = useState(false);
 
   const sizeGuideImages = [
-    { size: 'Small', image: '/toji-small.jpg' },
-    { size: 'Medium', image: '/toji-medium.jpg' },
-    { size: 'Large', image: '/toji-large.jpg' },
-    { size: 'XL', image: '/toji-xl.jpg' }
+    { size: 'Small', image: '/small.png' },
+    { size: 'Medium', image: '/medium.png' },
+    { size: 'Large', image: '/large.png' },
+    { size: 'XL', image: '/xlarge.png' }
   ];
 
   return (
