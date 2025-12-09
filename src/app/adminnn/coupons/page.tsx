@@ -73,14 +73,23 @@ export default function CouponsPage() {
     try {
       const url = '/api/coupons';
       const method = editingCoupon ? 'PATCH' : 'POST';
-      const body = editingCoupon
-        ? { id: editingCoupon.id, ...formData }
-        : formData;
+      
+      // Prepare data with proper type conversions
+      const payload = {
+        ...(editingCoupon && { id: editingCoupon.id }),
+        code: formData.code,
+        name: formData.name,
+        discount_type: formData.discount_type,
+        discount_value: parseFloat(formData.discount_value),
+        influencer_name: formData.influencer_name || null,
+        max_usage: formData.max_usage ? parseInt(formData.max_usage) : null,
+        expires_at: formData.expires_at || null,
+      };
 
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {

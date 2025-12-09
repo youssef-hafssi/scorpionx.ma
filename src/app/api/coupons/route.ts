@@ -83,12 +83,21 @@ export async function POST(request: NextRequest) {
     const { code, name, discount_type, discount_value, influencer_name, max_usage, expires_at } = body;
 
     // Validate required fields
-    if (!code || !name || !discount_type || !discount_value) {
+    if (!code || !name || !discount_type || discount_value === undefined || discount_value === null) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
+
+    // Parse numeric values
+    const parsedDiscountValue = typeof discount_value === 'string' 
+      ? parseFloat(discount_value) 
+      : discount_value;
+    
+    const parsedMaxUsage = max_usage 
+      ? (typeof max_usage === 'string' ? parseInt(max_usage) : max_usage)
+      : null;
 
     // Insert coupon
     const { data: coupon, error } = await supabase
@@ -97,9 +106,9 @@ export async function POST(request: NextRequest) {
         code: code.toUpperCase(),
         name,
         discount_type,
-        discount_value: parseFloat(discount_value),
+        discount_value: parsedDiscountValue,
         influencer_name: influencer_name || null,
-        max_usage: max_usage || null,
+        max_usage: parsedMaxUsage,
         expires_at: expires_at || null,
         is_active: true
       })
@@ -107,6 +116,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
+      console.error('Supabase insert error:', error);
       if (error.code === '23505') { // Unique constraint violation
         return NextResponse.json(
           { error: 'Coupon code already exists' },
@@ -120,7 +130,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating coupon:', error);
     return NextResponse.json(
-      { error: 'Failed to create coupon' },
+      { error: 'Failed to create coupon', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -144,6 +154,19 @@ export async function PATCH(request: NextRequest) {
       updates.code = updates.code.toUpperCase();
     }
 
+    // Parse numeric values if they're strings
+    if (updates.discount_value !== undefined) {
+      updates.discount_value = typeof updates.discount_value === 'string' 
+        ? parseFloat(updates.discount_value) 
+        : updates.discount_value;
+    }
+
+    if (updates.max_usage !== undefined && updates.max_usage !== null) {
+      updates.max_usage = typeof updates.max_usage === 'string' 
+        ? parseInt(updates.max_usage) 
+        : updates.max_usage;
+    }
+
     const { data: coupon, error } = await supabase
       .from('coupons')
       .update(updates)
@@ -151,13 +174,16 @@ export async function PATCH(request: NextRequest) {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase update error:', error);
+      throw error;
+    }
 
     return NextResponse.json({ coupon });
   } catch (error) {
     console.error('Error updating coupon:', error);
     return NextResponse.json(
-      { error: 'Failed to update coupon' },
+      { error: 'Failed to update coupon', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
