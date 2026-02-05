@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/lib/cart-context';
-import { calculateProductPrice } from '@/lib/pricing';
+import { calculateCartTotalWithBundles, TRACK_BUNDLE, calculateBundleSavings } from '@/lib/pricing';
 import { X, ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react';
 
 interface CartSidebarProps {
@@ -30,20 +30,23 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const totalQuantity = items.reduce((total, item) => total + item.quantity, 0);
   
   // Group items by product ID to apply bulk pricing correctly
-  const productGroups = items.reduce((groups, item) => {
+  const productQuantities = items.reduce((groups, item) => {
     const productId = item.product.id;
     if (!groups[productId]) {
-      groups[productId] = { items: [], totalQuantity: 0 };
+      groups[productId] = 0;
     }
-    groups[productId].items.push(item);
-    groups[productId].totalQuantity += item.quantity;
+    groups[productId] += item.quantity;
     return groups;
-  }, {} as Record<string, { items: typeof items, totalQuantity: number }>);
+  }, {} as Record<string, number>);
 
-  // Calculate subtotal by applying bulk pricing per product
-  const subtotal = Object.entries(productGroups).reduce((total, [productId, group]) => {
-    return total + calculateProductPrice(productId, group.totalQuantity);
-  }, 0);
+  // Calculate subtotal with bundle pricing
+  const subtotal = calculateCartTotalWithBundles(productQuantities);
+  
+  // Check if bundle discount is applied
+  const sweatQty = productQuantities['sweat'] || 0;
+  const sweaterQty = productQuantities['track-sweater'] || 0;
+  const bundleCount = Math.min(sweatQty, sweaterQty);
+  const hasBundleDiscount = bundleCount > 0;
 
   if (!isVisible) return null;
 
@@ -152,6 +155,13 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
           {/* Footer */}
           {items.length > 0 && (
             <div className="border-t p-4 space-y-4">
+              {hasBundleDiscount && (
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-green-700 text-sm font-medium">
+                    🎉 Bundle Deal Applied! You save {calculateBundleSavings(bundleCount)} DH
+                  </p>
+                </div>
+              )}
               <div className="flex justify-between items-center">
                 <span className="text-base font-medium">Total ({totalQuantity} items):</span>
                 <span className="text-lg font-bold">{subtotal} DH</span>

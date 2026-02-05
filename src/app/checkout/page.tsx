@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,7 +12,7 @@ import { useCart } from '@/lib/cart-context';
 import { useOrders } from '@/lib/order-context';
 import { useCoupon } from '@/lib/coupon-context';
 import { CouponInput } from '@/components/coupon-input';
-import { calculateProductPrice } from '@/lib/pricing';
+import { calculateCartTotalWithBundles, TRACK_BUNDLE } from '@/lib/pricing';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -30,20 +31,23 @@ export default function CheckoutPage() {
   const totalQuantity = items.reduce((total, item) => total + item.quantity, 0);
   
   // Group items by product ID to apply bulk pricing correctly
-  const productGroups = items.reduce((groups, item) => {
+  const productQuantities = items.reduce((groups, item) => {
     const productId = item.product.id;
     if (!groups[productId]) {
-      groups[productId] = { items: [], totalQuantity: 0 };
+      groups[productId] = 0;
     }
-    groups[productId].items.push(item);
-    groups[productId].totalQuantity += item.quantity;
+    groups[productId] += item.quantity;
     return groups;
-  }, {} as Record<string, { items: typeof items, totalQuantity: number }>);
+  }, {} as Record<string, number>);
 
-  // Calculate subtotal by applying bulk pricing per product
-  const subtotal = Object.entries(productGroups).reduce((total, [productId, group]) => {
-    return total + calculateProductPrice(productId, group.totalQuantity);
-  }, 0);
+  // Calculate subtotal with bundle pricing
+  const subtotal = calculateCartTotalWithBundles(productQuantities);
+  
+  // Check if bundle discount is applied
+  const sweatQty = productQuantities['sweat'] || 0;
+  const sweaterQty = productQuantities['track-sweater'] || 0;
+  const bundleCount = Math.min(sweatQty, sweaterQty);
+  const hasBundleDiscount = bundleCount > 0;
   
   const discount = calculateDiscount(subtotal);
   const shipping = 0; // Fixed at 0DH
@@ -180,9 +184,19 @@ export default function CheckoutPage() {
               
               <div className="space-y-3">
                 {items.map((item) => (
-                  <div key={item.product.id} className="flex justify-between items-center py-1">
-                    <span className="font-medium text-sm">{item.product.name} (x{item.quantity})</span>
-                    <span className="text-gray-600 text-xs">Size: {item.product.selectedSize}</span>
+                  <div key={item.product.id} className="flex items-center gap-3 py-2">
+                    <div className="relative w-12 h-12 flex-shrink-0">
+                      <Image
+                        src={item.product.image}
+                        alt={item.product.name}
+                        fill
+                        className="object-cover rounded"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="font-medium text-sm block truncate">{item.product.name} (x{item.quantity})</span>
+                      <span className="text-gray-600 text-xs">Size: {item.product.selectedSize}</span>
+                    </div>
                   </div>
                 ))}
               </div>              {/* Coupon Code Section */}
@@ -197,7 +211,18 @@ export default function CheckoutPage() {
                   <span className="font-medium text-sm">{totalQuantity}</span>
                 </div>
 
-                {totalQuantity > 1 && (
+                {hasBundleDiscount && (
+                  <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                    <p className="text-green-700 text-sm font-medium">
+                      🎉 Bundle Deal! You save {bundleCount * TRACK_BUNDLE.savings} DH
+                    </p>
+                    <p className="text-green-600 text-xs mt-1">
+                      Track Pants + Track Sweater bundle: {TRACK_BUNDLE.bundlePrice} DH
+                    </p>
+                  </div>
+                )}
+
+                {totalQuantity > 1 && !hasBundleDiscount && (
                   <div className="bg-green-50 p-2 rounded text-xs text-green-700">
                     💰 Bulk pricing applied! You're saving money with this quantity.
                   </div>

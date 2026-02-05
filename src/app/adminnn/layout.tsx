@@ -25,6 +25,7 @@ export default function AdminLayout({
                pathname.startsWith('/adminnn/orders/') ? 'Order Details' :
                pathname === '/adminnn/orders' ? 'Orders Management' :
                pathname === '/adminnn/stock' ? 'Stock Management' :
+               pathname === '/adminnn/products' ? 'Products Management' :
                pathname === '/adminnn/coupons' ? 'Coupon Management' :
                'Admin Panel'}
             </h1>
@@ -38,6 +39,14 @@ export default function AdminLayout({
                   size="sm"
                 >
                   Orders
+                </Button>
+              </Link>
+              <Link href="/adminnn/products">
+                <Button
+                  variant={pathname === '/adminnn/products' ? 'default' : 'ghost'}
+                  size="sm"
+                >
+                  Products
                 </Button>
               </Link>
               <Link href="/adminnn/stock">

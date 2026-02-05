@@ -29,6 +29,9 @@ export default function TojiSweatpantsPage() {
   const [stockData, setStockData] = useState<Record<string, StockInfo>>({});
   const [stockLoading, setStockLoading] = useState(true); const [stockMessage, setStockMessage] = useState('In Stock. Ready to Ship.');
   const [selectedMainImage, setSelectedMainImage] = useState('/34.jpeg');
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const productSizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
   // Hardcoded product data
@@ -173,12 +176,24 @@ Premium streetwear comfort meets Islamic modesty. The ultimate sweatpants design
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Product Image */}
         <div className="bg-white p-4 rounded-lg shadow-sm">
-          <div className="relative aspect-square overflow-hidden rounded-lg border">
+          <div 
+            className="relative aspect-square overflow-hidden rounded-lg border cursor-zoom-in"
+            onClick={() => selectedMainImage && setIsZoomOpen(true)}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = ((e.clientX - rect.left) / rect.width) * 100;
+              const y = ((e.clientY - rect.top) / rect.height) * 100;
+              setMousePosition({ x, y });
+            }}
+          >
             <Image
               src={selectedMainImage}
               alt={productData.name}
               fill
-              className="object-contain p-4"
+              className={`object-cover transition-transform duration-200 ${isHovering ? 'scale-150' : 'scale-100'}`}
+              style={isHovering ? { transformOrigin: `${mousePosition.x}% ${mousePosition.y}%` } : undefined}
               priority
               sizes="(max-width: 768px) 100vw, 50vw"
             />
@@ -199,7 +214,7 @@ Premium streetwear comfort meets Islamic modesty. The ultimate sweatpants design
                     src={image}
                     alt={`${productData.name} - Additional Image ${index + 1}`}
                     fill
-                    className="object-cover p-2"
+                    className="object-cover"
                     sizes="(max-width: 768px) 25vw, 12vw"
                   />
                 </div>
@@ -387,6 +402,81 @@ Premium streetwear comfort meets Islamic modesty. The ultimate sweatpants design
           </div>
         </div>
       </div>
+
+      {/* Image Zoom Modal */}
+      {isZoomOpen && selectedMainImage && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setIsZoomOpen(false)}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setIsZoomOpen(false)}
+            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10"
+            aria-label="Close zoom"
+          >
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Navigation arrows */}
+          {additionalImages.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const currentIndex = additionalImages.indexOf(selectedMainImage);
+                  const prevIndex = currentIndex === 0 ? additionalImages.length - 1 : currentIndex - 1;
+                  setSelectedMainImage(additionalImages[prevIndex]);
+                }}
+                className="absolute left-4 text-white hover:text-gray-300 transition-colors z-10 p-2"
+                aria-label="Previous image"
+              >
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const currentIndex = additionalImages.indexOf(selectedMainImage);
+                  const nextIndex = currentIndex === additionalImages.length - 1 ? 0 : currentIndex + 1;
+                  setSelectedMainImage(additionalImages[nextIndex]);
+                }}
+                className="absolute right-4 text-white hover:text-gray-300 transition-colors z-10 p-2"
+                aria-label="Next image"
+              >
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </>
+          )}
+
+          {/* Zoomed image */}
+          <div 
+            className="relative w-full h-full max-w-4xl max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={selectedMainImage}
+              alt={productData.name}
+              fill
+              className="object-contain"
+              sizes="100vw"
+              priority
+            />
+          </div>
+
+          {/* Image counter */}
+          {additionalImages.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm">
+              {additionalImages.indexOf(selectedMainImage) + 1} / {additionalImages.length}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

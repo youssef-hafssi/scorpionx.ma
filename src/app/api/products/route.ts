@@ -6,11 +6,22 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('productId');
 
+    // If no productId, return all products
     if (!productId) {
-      return NextResponse.json(
-        { error: 'Product ID is required' },
-        { status: 400 }
-      );
+      const { data: allProducts, error: allProductsError } = await supabase
+        .from('products')
+        .select('*')
+        .order('name');
+
+      if (allProductsError) {
+        console.error('Error fetching all products:', allProductsError);
+        return NextResponse.json(
+          { error: 'Failed to fetch products' },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json(allProducts);
     }
 
     // Fetch product from database
@@ -89,6 +100,58 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Unexpected error in products API:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT - Update a product
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { id, name, description, price, original_price, image } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Product ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const updateData: Record<string, any> = {};
+    if (name !== undefined) updateData.name = name;
+    if (description !== undefined) updateData.description = description;
+    if (price !== undefined) updateData.price = price;
+    if (original_price !== undefined) updateData.original_price = original_price;
+    if (image !== undefined) updateData.image = image;
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        { error: 'No fields to update' },
+        { status: 400 }
+      );
+    }
+
+    const { data, error } = await supabase
+      .from('products')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Database error:', error);
+      return NextResponse.json(
+        { error: 'Failed to update product', details: error.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -2,6 +2,12 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+// Bundle configuration
+const TRACK_BUNDLE = {
+  products: ['sweat', 'track-sweater'],
+  bundlePrice: 475,
+};
+
 export type Product = {
   id: string;
   name: string;
@@ -11,6 +17,7 @@ export type Product = {
   description: string;
   sizes: string[];
   selectedSize?: string;
+  isBundle?: boolean; // Flag to indicate item was added as part of a bundle
 };
 
 export type CartItem = {
@@ -150,10 +157,52 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const subtotal = items.reduce(
-    (total, item) => total + item.product.price * item.quantity,
-    0
-  );
+  // Calculate subtotal with bundle pricing
+  const calculateSubtotal = (): number => {
+    // Check if both bundle products are in cart
+    const bundleProductIds = TRACK_BUNDLE.products;
+    const bundleItemsInCart = items.filter(item => 
+      bundleProductIds.includes(item.product.id)
+    );
+    
+    // Count how many of each bundle product we have
+    const sweatItems = items.filter(item => item.product.id === 'sweat');
+    const sweaterItems = items.filter(item => item.product.id === 'track-sweater');
+    
+    const sweatQty = sweatItems.reduce((sum, item) => sum + item.quantity, 0);
+    const sweaterQty = sweaterItems.reduce((sum, item) => sum + item.quantity, 0);
+    
+    // Calculate how many complete bundles we can make
+    const completeBundles = Math.min(sweatQty, sweaterQty);
+    
+    // Calculate remaining items after bundles
+    const remainingSweat = sweatQty - completeBundles;
+    const remainingSweater = sweaterQty - completeBundles;
+    
+    // Get prices for individual items
+    const sweatPrice = 270; // Track Pants individual price
+    const sweaterPrice = 250; // Track Sweater individual price
+    
+    // Calculate bundle total
+    let total = completeBundles * TRACK_BUNDLE.bundlePrice;
+    
+    // Add remaining individual items at their full price
+    total += remainingSweat * sweatPrice;
+    total += remainingSweater * sweaterPrice;
+    
+    // Add other non-bundle items
+    const nonBundleItems = items.filter(item => 
+      !bundleProductIds.includes(item.product.id)
+    );
+    total += nonBundleItems.reduce(
+      (sum, item) => sum + item.product.price * item.quantity,
+      0
+    );
+    
+    return total;
+  };
+
+  const subtotal = calculateSubtotal();
 
   return (
     <CartContext.Provider
