@@ -30,8 +30,8 @@ export default function ProductsManagementPage() {
   const availableImages = [
     '/pant1.png', '/pant2.png', '/pant3.png', '/pant4.png',
     '/zipup1.png', '/zipup2.png', '/zipup3.png', '/zipup4.png',
-    '/pc1.jpg', '/pc2.jpg', '/pc3.jpg', '/pc4.jpg',
     '/32.jpeg', '/34.jpeg', '/36.jpeg', '/37.jpeg',
+    '/aw1.jpeg', '/aw2.jpeg', '/aw3.jpeg',
     '/sweat.jpg', '/hero.jpg', '/logo.png'
   ];
 

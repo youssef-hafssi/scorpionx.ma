@@ -22,15 +22,13 @@ export default function ProductPage() {
   const [stockData, setStockData] = useState<Record<string, StockInfo>>({});
   const [stockLoading, setStockLoading] = useState(true);
   const [stockMessage, setStockMessage] = useState('In Stock. Ready to Ship.');
-  const [selectedMainImage, setSelectedMainImage] = useState('/pc3.jpg'); // Start with pc3.jpg
+  const [selectedMainImage, setSelectedMainImage] = useState('/aw1.jpeg');
 
-  // Additional product images for gallery (beach photos first, then white background)
+  // Additional product images for gallery
   const additionalImages = [
-    '/pc3.jpg',
-    '/pc1.jpg',
-    '/pc2.jpg',
-    '/pc4.jpg',
-    '/IMG_8581-removebg-preview.png'
+    '/aw1.jpeg',
+    '/aw2.jpeg',
+    '/aw3.jpeg'
   ];
   const totalPrice = calculatePrice(quantity);
   const pricePerItem = getPricePerItem(quantity);

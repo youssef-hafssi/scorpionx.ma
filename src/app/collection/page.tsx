@@ -45,7 +45,7 @@ export default function CollectionPage() {
       description: 'Premium Islamic modest wear combining traditional values with modern streetwear aesthetics',
       price: 220,
       originalPrice: 250,
-      image: '/pc4.jpg',
+      image: '/aw1.jpeg',
       slug: '/awrah-cover',
       available: true,
     },
