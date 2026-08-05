@@ -143,6 +143,38 @@ export const getTrackSweaterPricingTable = () => {
   ];
 };
 
+// Awrah Cover Leggings Pricing (1 = 140, each additional item = +60)
+export const calculateLeggingsPrice = (quantity: number): number => {
+  return quantity * 60 + 80;
+};
+
+export const getLeggingsPricePerItem = (quantity: number): number => {
+  const totalPrice = calculateLeggingsPrice(quantity);
+  return totalPrice / quantity;
+};
+
+export const getLeggingsPricingInfo = (quantity: number) => {
+  const totalPrice = calculateLeggingsPrice(quantity);
+  const pricePerItem = getLeggingsPricePerItem(quantity);
+  const hasBulkDiscount = quantity > 1;
+
+  return {
+    totalPrice,
+    pricePerItem,
+    hasBulkDiscount,
+    quantity
+  };
+};
+
+export const getLeggingsPricingTable = () => {
+  return [
+    { quantity: 1, totalPrice: 140, pricePerItem: 140 },
+    { quantity: 2, totalPrice: 200, pricePerItem: 100 },
+    { quantity: 3, totalPrice: 260, pricePerItem: 86.67 },
+    { quantity: '4+', totalPrice: 'varies', pricePerItem: 'varies' }
+  ];
+};
+
 // Bundle Configuration
 export const TRACK_BUNDLE = {
   products: ['sweat', 'track-sweater'],
@@ -179,6 +211,9 @@ export const calculateProductPrice = (productId: string, quantity: number): numb
   }
   if (productId === 'track-sweater') {
     return calculateTrackSweaterPrice(quantity);
+  }
+  if (productId === 'awrah-cover-leggings') {
+    return calculateLeggingsPrice(quantity);
   }
   // Default to Awrah Cover pricing for awrah-cover or any other product
   return calculatePrice(quantity);

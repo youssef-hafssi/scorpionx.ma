@@ -67,6 +67,36 @@ ON CONFLICT (product_id, size) DO UPDATE SET
   updated_at = NOW();
 
 -- ============================================
+-- 3. AWRAH OVER LEGGINGS
+-- ============================================
+INSERT INTO products (id, name, description, price, original_price, image) VALUES
+(
+  'awrah-cover-leggings',
+  'Awrah Cover Leggings',
+  'Modest coverage leggings designed to be worn under shorts or a thobe. Soft, stretchy fabric with an elastic waistband for a secure, comfortable fit during sport, prayer, or everyday wear.',
+  140,
+  140,
+  '/leggings1.jpeg'
+)
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  description = EXCLUDED.description,
+  price = EXCLUDED.price,
+  original_price = EXCLUDED.original_price,
+  image = EXCLUDED.image,
+  updated_at = NOW();
+
+-- Insert stock for Awrah Cover Leggings (grouped sizes)
+INSERT INTO product_stock (product_id, size, quantity, low_stock_threshold) VALUES
+('awrah-cover-leggings', 'XS-S', 20, 5),
+('awrah-cover-leggings', 'M-L', 25, 5),
+('awrah-cover-leggings', 'XL-XXL', 15, 5)
+ON CONFLICT (product_id, size) DO UPDATE SET
+  quantity = EXCLUDED.quantity,
+  low_stock_threshold = EXCLUDED.low_stock_threshold,
+  updated_at = NOW();
+
+-- ============================================
 -- VERIFICATION QUERIES
 -- ============================================
 

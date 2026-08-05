@@ -7,6 +7,17 @@ import Link from 'next/link';
 export default function CollectionPage() {
   const products = [
     {
+      id: 'awrah-cover-leggings',
+      name: 'Awrah Cover Leggings',
+      description: 'Modest coverage leggings designed to be worn under shorts or a thobe for full-day comfort and coverage',
+      price: 140,
+      originalPrice: 140,
+      image: '/leggings1.jpeg',
+      slug: '/awrah-cover-leggings',
+      available: true,
+      onSale: true,
+    },
+    {
       id: 'sweat',
       name: 'SCORPIONX TRACK PANTS MIDNIGHT BLUE',
       description: 'Premium quality track pants designed for comfort and style. Perfect for everyday wear.',
@@ -16,6 +27,7 @@ export default function CollectionPage() {
       slug: '/sweat',
       available: true,
       comingSoon: false,
+      onSale: false,
     },
     {
       id: 'track-sweater',
@@ -27,6 +39,7 @@ export default function CollectionPage() {
       slug: '/track-sweater',
       available: true,
       comingSoon: false,
+      onSale: false,
     },
     {
       id: 'toji-sweatpants',
@@ -38,6 +51,7 @@ export default function CollectionPage() {
       slug: '/toji-sweatpants',
       available: true,
       comingSoon: false,
+      onSale: false,
     },
     {
       id: 'awrah-cover',
@@ -48,6 +62,7 @@ export default function CollectionPage() {
       image: '/aw1.jpeg',
       slug: '/awrah-cover',
       available: true,
+      onSale: false,
     },
   ];
 
@@ -91,7 +106,7 @@ export default function CollectionPage() {
                       COMING SOON
                     </div>
                   )}
-                  {product.originalPrice > product.price && !product.comingSoon && (
+                  {product.onSale && !product.comingSoon && (
                     <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold">
                       SALE
                     </div>
