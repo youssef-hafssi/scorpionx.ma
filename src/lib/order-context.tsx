@@ -428,6 +428,45 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       // Add order to local state immediately after database operations
       setOrders(prev => [newOrder, ...prev]);
 
+      // Fire Meta Purchase event (Pixel + Conversions API) now that the order truly exists.
+      // Both use orderData.id as event_id so Meta dedupes the browser + server events.
+      if (typeof window !== 'undefined') {
+        try {
+          const getCookie = (name: string): string | undefined => {
+            const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+            return match ? decodeURIComponent(match[1]) : undefined;
+          };
+          const fbp = getCookie('_fbp');
+          const fbc = getCookie('_fbc');
+
+          if ((window as any).fbq) {
+            (window as any).fbq('track', 'Purchase', {
+              value: totals.total,
+              currency: 'MAD',
+            }, { eventID: orderData.id });
+          }
+
+          fetch('/api/meta/capi', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              eventId: orderData.id,
+              value: totals.total,
+              currency: 'MAD',
+              email: customerInfo.email || undefined,
+              phone: customerInfo.phoneNumber,
+              fbp,
+              fbc,
+              eventSourceUrl: window.location.href,
+            }),
+          }).catch(error => {
+            console.error('Failed to send Meta Conversions API event:', error);
+          });
+        } catch (error) {
+          console.error('Error firing Meta Purchase event:', error);
+        }
+      }
+
       // Update stock quantities (critical - wait for this)
       try {
         await updateStockAfterOrder(items);
