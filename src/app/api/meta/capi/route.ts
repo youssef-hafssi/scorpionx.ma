@@ -80,6 +80,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: result }, { status: 502 });
     }
 
+    console.log('Meta Purchase event sent:', eventId, result);
     return NextResponse.json({ success: true, result });
   } catch (error) {
     console.error('Error sending Meta Purchase event:', error);
