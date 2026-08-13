@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Edit, Trash2, Tag, Users, TrendingUp, RefreshCw } from 'lucide-react';
+import { Plus, Edit, Trash2, Tag, Users, TrendingUp, RefreshCw, ChevronDown, ChevronUp, Package } from 'lucide-react';
 
 interface Coupon {
   id: string;
@@ -34,6 +34,26 @@ interface Coupon {
   is_active: boolean;
   expires_at: string | null;
   created_at: string;
+}
+
+interface CouponUsageItem {
+  productName: string;
+  size: string | null;
+  quantity: number;
+  price: number;
+}
+
+interface CouponUsage {
+  orderId: string;
+  orderNumber: string;
+  customerName: string;
+  customerPhone: string;
+  status: string;
+  subtotal: number;
+  discountAmount: number;
+  totalAfterDiscount: number;
+  createdAt: string;
+  items: CouponUsageItem[];
 }
 
 export default function CouponsPage() {
@@ -50,10 +70,36 @@ export default function CouponsPage() {
     max_usage: '',
     expires_at: '',
   });
+  const [expandedCouponId, setExpandedCouponId] = useState<string | null>(null);
+  const [usageByCoupon, setUsageByCoupon] = useState<Record<string, CouponUsage[]>>({});
+  const [loadingUsageId, setLoadingUsageId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCoupons();
   }, []);
+
+  const toggleUsageDetails = async (coupon: Coupon) => {
+    if (expandedCouponId === coupon.id) {
+      setExpandedCouponId(null);
+      return;
+    }
+
+    setExpandedCouponId(coupon.id);
+
+    if (usageByCoupon[coupon.id]) return;
+
+    setLoadingUsageId(coupon.id);
+    try {
+      const response = await fetch(`/api/coupons/usage?code=${encodeURIComponent(coupon.code)}`);
+      const data = await response.json();
+      setUsageByCoupon((prev) => ({ ...prev, [coupon.id]: data.usages || [] }));
+    } catch (error) {
+      console.error('Error fetching coupon usage details:', error);
+      setUsageByCoupon((prev) => ({ ...prev, [coupon.id]: [] }));
+    } finally {
+      setLoadingUsageId(null);
+    }
+  };
 
   const fetchCoupons = async () => {
     try {
@@ -377,8 +423,9 @@ export default function CouponsPage() {
               {coupons.map((coupon) => (
                 <div
                   key={coupon.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                  className="border rounded-lg hover:bg-gray-50"
                 >
+                <div className="flex items-center justify-between p-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <code className="text-lg font-bold bg-gray-100 px-3 py-1 rounded">
@@ -420,6 +467,19 @@ export default function CouponsPage() {
                     <Button
                       variant="ghost"
                       size="sm"
+                      onClick={() => toggleUsageDetails(coupon)}
+                    >
+                      <Package className="h-4 w-4 mr-1" />
+                      Usage Details
+                      {expandedCouponId === coupon.id ? (
+                        <ChevronUp className="h-4 w-4 ml-1" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 ml-1" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => toggleActive(coupon)}
                     >
                       {coupon.is_active ? 'Deactivate' : 'Activate'}
@@ -440,6 +500,69 @@ export default function CouponsPage() {
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
+                </div>
+
+                {expandedCouponId === coupon.id && (
+                  <div className="border-t bg-gray-50 p-4">
+                    {loadingUsageId === coupon.id ? (
+                      <div className="flex items-center justify-center py-6">
+                        <RefreshCw className="h-5 w-5 animate-spin text-gray-400" />
+                      </div>
+                    ) : (usageByCoupon[coupon.id]?.length ?? 0) === 0 ? (
+                      <p className="text-sm text-gray-500 text-center py-4">
+                        This coupon hasn't been used on any order yet.
+                      </p>
+                    ) : (
+                      <div className="space-y-3">
+                        {usageByCoupon[coupon.id].map((usage) => (
+                          <div
+                            key={usage.orderId}
+                            className="bg-white border rounded-md p-3 text-sm"
+                          >
+                            <div className="flex items-center justify-between flex-wrap gap-2">
+                              <div>
+                                <span className="font-semibold">{usage.customerName}</span>
+                                <span className="text-gray-500"> • {usage.customerPhone}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline">{usage.status}</Badge>
+                                <span className="text-gray-500">
+                                  {new Date(usage.createdAt).toLocaleDateString()}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="mt-2 space-y-1">
+                              {usage.items.map((item, idx) => (
+                                <div key={idx} className="text-gray-700">
+                                  {item.productName}
+                                  {item.size && ` (Size: ${item.size})`} × {item.quantity}
+                                  {' — '}
+                                  <span className="text-gray-500">{item.price} DH each</span>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="mt-2 pt-2 border-t flex items-center gap-4 text-xs">
+                              <span>
+                                Order: <span className="font-medium">{usage.orderNumber}</span>
+                              </span>
+                              <span>
+                                Subtotal: <span className="font-medium">{usage.subtotal} DH</span>
+                              </span>
+                              <span className="text-red-600">
+                                Discount: -{usage.discountAmount} DH
+                              </span>
+                              <span className="text-green-600 font-semibold">
+                                Price after coupon: {usage.totalAfterDiscount} DH
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
                 </div>
               ))}
             </div>

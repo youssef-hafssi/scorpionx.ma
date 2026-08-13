@@ -143,9 +143,11 @@ export const getTrackSweaterPricingTable = () => {
   ];
 };
 
-// Awrah Cover Leggings Pricing (1 = 140, each additional item = +60)
+// Awrah Cover Leggings Pricing (1 = 140, 2 = 200, 3 = 280, each additional item after that = +80)
 export const calculateLeggingsPrice = (quantity: number): number => {
-  return quantity * 60 + 80;
+  if (quantity === 1) return 140;
+  if (quantity === 2) return 200;
+  return 280 + (quantity - 3) * 80;
 };
 
 export const getLeggingsPricePerItem = (quantity: number): number => {
@@ -170,7 +172,7 @@ export const getLeggingsPricingTable = () => {
   return [
     { quantity: 1, totalPrice: 140, pricePerItem: 140 },
     { quantity: 2, totalPrice: 200, pricePerItem: 100 },
-    { quantity: 3, totalPrice: 260, pricePerItem: 86.67 },
+    { quantity: 3, totalPrice: 280, pricePerItem: 93.33 },
     { quantity: '4+', totalPrice: 'varies', pricePerItem: 'varies' }
   ];
 };
