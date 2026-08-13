@@ -257,13 +257,9 @@ Premium Islamic modest wear designed for brothers who want reliable coverage wit
                   <span>2 items:</span>
                   <span>200 DH</span>
                 </div>
-                <div className={`flex justify-between p-2 rounded ${quantity === 3 ? 'bg-blue-100 font-medium' : ''}`}>
+                <div className={`flex justify-between p-2 rounded ${quantity >= 3 ? 'bg-blue-100 font-medium' : ''}`}>
                   <span>3 items:</span>
                   <span>280 DH</span>
-                </div>
-                <div className={`flex justify-between p-2 rounded ${quantity >= 4 ? 'bg-blue-100 font-medium' : ''}`}>
-                  <span>4+ items:</span>
-                  <span>+80 DH each</span>
                 </div>
               </div>
             </div>
