@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/lib/cart-context';
-import { calculateCartTotalWithBundles, TRACK_BUNDLE, calculateBundleSavings } from '@/lib/pricing';
+import { calculateCartTotalWithBundles, TRACK_BUNDLE, calculateBundleSavings, getTrackBundleCount } from '@/lib/pricing';
 import { X, ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react';
 
 interface CartSidebarProps {
@@ -43,9 +43,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const subtotal = calculateCartTotalWithBundles(productQuantities);
   
   // Check if bundle discount is applied
-  const sweatQty = productQuantities['sweat'] || 0;
-  const sweaterQty = productQuantities['track-sweater'] || 0;
-  const bundleCount = Math.min(sweatQty, sweaterQty);
+  const bundleCount = getTrackBundleCount(productQuantities);
   const hasBundleDiscount = bundleCount > 0;
 
   if (!isVisible) return null;

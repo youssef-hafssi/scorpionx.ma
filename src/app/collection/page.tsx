@@ -7,6 +7,30 @@ import Link from 'next/link';
 export default function CollectionPage() {
   const products = [
     {
+      id: 'track-pants-black',
+      name: 'SCORPIONX TRACK PANTS BLACK',
+      description: 'Premium quality track pants designed for comfort and style. Perfect for everyday wear.',
+      price: 270,
+      originalPrice: 350,
+      image: '/bk4.jpeg',
+      slug: '/track-pants-black',
+      available: true,
+      comingSoon: false,
+      onSale: false,
+    },
+    {
+      id: 'zipup-hoodie-black',
+      name: 'SCORPIONX ZIPUP HOODIE BLACK',
+      description: 'Premium cropped zip-up hoodie designed for comfort and style. Perfect for everyday wear.',
+      price: 250,
+      originalPrice: 350,
+      image: '/bk2.jpeg',
+      slug: '/zipup-hoodie-black',
+      available: true,
+      comingSoon: false,
+      onSale: false,
+    },
+    {
       id: 'awrah-cover-leggings',
       name: 'Awrah Cover Leggings',
       description: 'Modest coverage leggings designed to be worn under shorts or a thobe for full-day comfort and coverage',

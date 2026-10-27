@@ -12,7 +12,7 @@ import { useCart } from '@/lib/cart-context';
 import { useOrders } from '@/lib/order-context';
 import { useCoupon } from '@/lib/coupon-context';
 import { CouponInput } from '@/components/coupon-input';
-import { calculateCartTotalWithBundles, TRACK_BUNDLE } from '@/lib/pricing';
+import { calculateCartTotalWithBundles, TRACK_BUNDLE, getTrackBundleCount } from '@/lib/pricing';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -44,9 +44,7 @@ export default function CheckoutPage() {
   const subtotal = calculateCartTotalWithBundles(productQuantities);
   
   // Check if bundle discount is applied
-  const sweatQty = productQuantities['sweat'] || 0;
-  const sweaterQty = productQuantities['track-sweater'] || 0;
-  const bundleCount = Math.min(sweatQty, sweaterQty);
+  const bundleCount = getTrackBundleCount(productQuantities);
   const hasBundleDiscount = bundleCount > 0;
   
   const discount = calculateDiscount(subtotal);

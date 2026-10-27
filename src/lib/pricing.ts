@@ -177,9 +177,13 @@ export const getLeggingsPricingTable = () => {
   ];
 };
 
+// Track pants / zip-up hoodie colorways share the same pricing and bundle together
+export const TRACK_PANTS_IDS = ['sweat', 'track-pants-black'];
+export const ZIPUP_HOODIE_IDS = ['track-sweater', 'zipup-hoodie-black'];
+
 // Bundle Configuration
 export const TRACK_BUNDLE = {
-  products: ['sweat', 'track-sweater'],
+  products: [...TRACK_PANTS_IDS, ...ZIPUP_HOODIE_IDS],
   bundlePrice: 475, // Price for 1 bundle
   bundlePriceMultiple: 440, // Price per bundle for 2+ bundles
   bundleShipping: 35, // Flat shipping for 2+ bundles
@@ -208,10 +212,10 @@ export const calculateProductPrice = (productId: string, quantity: number): numb
   if (productId === 'toji-sweatpants') {
     return calculateTojiPrice(quantity);
   }
-  if (productId === 'sweat') {
+  if (TRACK_PANTS_IDS.includes(productId)) {
     return calculateSweatPrice(quantity);
   }
-  if (productId === 'track-sweater') {
+  if (ZIPUP_HOODIE_IDS.includes(productId)) {
     return calculateTrackSweaterPrice(quantity);
   }
   if (productId === 'awrah-cover-leggings') {
@@ -221,13 +225,23 @@ export const calculateProductPrice = (productId: string, quantity: number): numb
   return calculatePrice(quantity);
 };
 
+const sumQuantities = (productQuantities: Record<string, number>, ids: string[]): number =>
+  ids.reduce((sum, id) => sum + (productQuantities[id] || 0), 0);
+
+// Number of complete pants + hoodie bundles in the cart (any colorway combination)
+export const getTrackBundleCount = (productQuantities: Record<string, number>): number =>
+  Math.min(
+    sumQuantities(productQuantities, TRACK_PANTS_IDS),
+    sumQuantities(productQuantities, ZIPUP_HOODIE_IDS)
+  );
+
 // Calculate cart total with bundle pricing
 export const calculateCartTotalWithBundles = (
   productQuantities: Record<string, number>
 ): number => {
-  const sweatQty = productQuantities['sweat'] || 0;
-  const sweaterQty = productQuantities['track-sweater'] || 0;
-  
+  const sweatQty = sumQuantities(productQuantities, TRACK_PANTS_IDS);
+  const sweaterQty = sumQuantities(productQuantities, ZIPUP_HOODIE_IDS);
+
   // Calculate how many complete bundles we can make
   const completeBundles = Math.min(sweatQty, sweaterQty);
   
@@ -248,7 +262,7 @@ export const calculateCartTotalWithBundles = (
   
   // Add other products
   Object.entries(productQuantities).forEach(([productId, qty]) => {
-    if (productId !== 'sweat' && productId !== 'track-sweater' && qty > 0) {
+    if (!TRACK_BUNDLE.products.includes(productId) && qty > 0) {
       total += calculateProductPrice(productId, qty);
     }
   });

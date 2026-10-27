@@ -37,6 +37,28 @@ const bundleProducts: Record<string, BundleProduct> = {
     price: 250,
     sizes: ['S', 'M', 'L', 'XL'],
   },
+  'track-pants-black': {
+    id: 'track-pants-black',
+    name: 'SCORPIONX TRACK PANTS BLACK',
+    image: '/bk4.jpeg',
+    price: 270,
+    sizes: ['M', 'L', 'XL'],
+  },
+  'zipup-hoodie-black': {
+    id: 'zipup-hoodie-black',
+    name: 'SCORPIONX ZIPUP HOODIE BLACK',
+    image: '/bk2.jpeg',
+    price: 250,
+    sizes: ['M', 'L', 'XL'],
+  },
+};
+
+// Each product is suggested with the matching piece of the same colorway
+const bundlePartners: Record<string, string> = {
+  'sweat': 'track-sweater',
+  'track-sweater': 'sweat',
+  'track-pants-black': 'zipup-hoodie-black',
+  'zipup-hoodie-black': 'track-pants-black',
 };
 
 const BUNDLE_PRICE = 475;
@@ -46,7 +68,7 @@ export function FrequentlyBoughtTogether({ currentProductId }: FrequentlyBoughtT
   
   // Determine which products to show in the bundle
   const currentProduct = bundleProducts[currentProductId];
-  const otherProductId = currentProductId === 'sweat' ? 'track-sweater' : 'sweat';
+  const otherProductId = bundlePartners[currentProductId];
   const otherProduct = bundleProducts[otherProductId];
   
   // Stock state for both products

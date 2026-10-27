@@ -3,8 +3,10 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 // Bundle configuration
+const TRACK_PANTS_IDS = ['sweat', 'track-pants-black'];
+const ZIPUP_HOODIE_IDS = ['track-sweater', 'zipup-hoodie-black'];
 const TRACK_BUNDLE = {
-  products: ['sweat', 'track-sweater'],
+  products: [...TRACK_PANTS_IDS, ...ZIPUP_HOODIE_IDS],
   bundlePrice: 475,
 };
 
@@ -166,8 +168,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
     
     // Count how many of each bundle product we have
-    const sweatItems = items.filter(item => item.product.id === 'sweat');
-    const sweaterItems = items.filter(item => item.product.id === 'track-sweater');
+    const sweatItems = items.filter(item => TRACK_PANTS_IDS.includes(item.product.id));
+    const sweaterItems = items.filter(item => ZIPUP_HOODIE_IDS.includes(item.product.id));
     
     const sweatQty = sweatItems.reduce((sum, item) => sum + item.quantity, 0);
     const sweaterQty = sweaterItems.reduce((sum, item) => sum + item.quantity, 0);

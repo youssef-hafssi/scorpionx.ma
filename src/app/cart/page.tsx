@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/lib/cart-context';
-import { calculateCartTotalWithBundles, TRACK_BUNDLE, calculateBundleSavings } from '@/lib/pricing';
+import { calculateCartTotalWithBundles, TRACK_BUNDLE, calculateBundleSavings, getTrackBundleCount } from '@/lib/pricing';
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, clearCart } = useCart();
@@ -31,9 +31,7 @@ export default function CartPage() {
   const subtotal = calculateCartTotalWithBundles(productQuantities);
   
   // Check if bundle discount is applied
-  const sweatQty = productQuantities['sweat'] || 0;
-  const sweaterQty = productQuantities['track-sweater'] || 0;
-  const bundleCount = Math.min(sweatQty, sweaterQty);
+  const bundleCount = getTrackBundleCount(productQuantities);
   const hasBundleDiscount = bundleCount > 0;
   
   const discount = promoApplied ? subtotal * 0.1 : 0; // 10% discount if promo applied
