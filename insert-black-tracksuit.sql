@@ -20,7 +20,7 @@ INSERT INTO products (id, name, description, price, original_price, image) VALUE
 • Gender: Unisex',
   270,
   350,
-  '/bk4.jpeg'
+  '/bkp.jpeg'
 )
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,

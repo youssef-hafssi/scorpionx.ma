@@ -12,7 +12,7 @@ export default function CollectionPage() {
       description: 'Premium quality track pants designed for comfort and style. Perfect for everyday wear.',
       price: 270,
       originalPrice: 350,
-      image: '/bk4.jpeg',
+      image: '/bkp.jpeg',
       slug: '/track-pants-black',
       available: true,
       comingSoon: false,

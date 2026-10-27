@@ -49,10 +49,10 @@ export default function TrackPantsBlackPage() {
 • Gender: Unisex`,
     price: 270,
     originalPrice: 350,
-    image: '/bk4.jpeg'
+    image: '/bkp.jpeg'
   };
   // Product images for gallery
-  const additionalImages: string[] = ['/bk4.jpeg', '/bk1.jpeg', '/bk2.jpeg', '/bk3.jpeg'];
+  const additionalImages: string[] = ['/bkp.jpeg', '/bkp2.jpeg', '/bkp3.jpeg', '/bkp4.jpeg'];
 
   const totalPrice = calculateSweatPrice(quantity);
   const pricePerItem = getSweatPricePerItem(quantity);

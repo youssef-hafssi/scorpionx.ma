@@ -40,7 +40,7 @@ const bundleProducts: Record<string, BundleProduct> = {
   'track-pants-black': {
     id: 'track-pants-black',
     name: 'SCORPIONX TRACK PANTS BLACK',
-    image: '/bk4.jpeg',
+    image: '/bkp.jpeg',
     price: 270,
     sizes: ['M', 'L', 'XL'],
   },
